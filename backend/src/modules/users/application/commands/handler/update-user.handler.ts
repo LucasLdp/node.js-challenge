@@ -4,7 +4,9 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 /**
- * Use case para atualizar um usuário existente. Verifica se o email fornecido já está em uso por outro usuário e se o usuário a ser atualizado existe. Se as validações passarem, atualiza os dados do usuário com as informações fornecidas.
+ * Use case para atualizar um usuário existente.
+ * Verifica se o email fornecido já está em uso por outro usuário e se o usuário a ser atualizado existe.
+ * Se as validações passarem, atualiza os dados do usuário com as informações fornecidas.
  *  */
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {

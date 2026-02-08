@@ -6,7 +6,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 @CommandHandler(CreateUserCommand)
 /**
- * Use case para criar um novo usuário. Verifica se o email já está em uso e, se não estiver, cria um novo usuário com os dados fornecidos.
+ * Use case para criar um novo usuário.
+ * Verifica se o email já está em uso e, se não estiver, cria um novo usuário com os dados fornecidos.
  *  */
 export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
   constructor(private userRepository: UserRepository) {}
