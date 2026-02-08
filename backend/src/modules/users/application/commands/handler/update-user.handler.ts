@@ -13,8 +13,10 @@ export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
   constructor(private userRepository: UserRepository) {}
 
   async execute({ id, data }: UpdateUserCommand): Promise<void> {
-    if (data.email) {
-      const userWithEmail = await this.userRepository.findByEmail(data.email);
+    const { email } = data;
+
+    if (email) {
+      const userWithEmail = await this.userRepository.findByEmail(email);
 
       if (userWithEmail && userWithEmail.id !== id) {
         throw new ConflictException('Email já está em uso.');

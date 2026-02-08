@@ -1,8 +1,9 @@
 import { UserRepository } from '@modules/users/domain/repositories/user.repository';
 import { CreateUserCommand } from '@modules/users/application/commands/command';
-import { User } from '../../../domain/entities/user.entity';
+
 import { ConflictException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { User } from '@/modules/users/domain/entities/user.entity';
 
 @CommandHandler(CreateUserCommand)
 /**
@@ -12,7 +13,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
   constructor(private userRepository: UserRepository) {}
 
-  async execute({ name, email, password }: CreateUserCommand): Promise<void> {
+  async execute({ data }: CreateUserCommand): Promise<void> {
+    const { name, email, password } = data;
     const existingUser = await this.userRepository.findByEmail(email);
 
     if (existingUser) {
