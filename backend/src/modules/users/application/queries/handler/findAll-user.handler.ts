@@ -1,9 +1,11 @@
 import { UserRepository } from '@modules/users/domain/repositories/user.repository';
-import { ListAllUserQuery } from '../query/listAll-user.query';
+import { ListAllUserQuery } from '@/modules/users/application/queries/query';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 /**
- * Use case para listar todos os usuários com paginação. Recebe um limite e uma página, e retorna os usuários correspondentes a essa página.
+ * Use case para listar todos os usuários com paginação.
+ * Recebe um limite e uma página, e retorna os usuários
+ * correspondentes a essa página.
  */
 @QueryHandler(ListAllUserQuery)
 export class FindAllUsersUseCase implements IQueryHandler<ListAllUserQuery> {
