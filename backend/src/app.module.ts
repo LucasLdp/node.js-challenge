@@ -24,6 +24,7 @@ import { validateEnvFunction } from '@/config/env-validation';
 import { PrismaModule } from 'nestjs-prisma';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { UsersModule } from '@/modules/users/users.module';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -50,6 +51,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       validate: validateEnvFunction,
     }),
     PrismaModule.forRoot({
+      isGlobal: true,
       prismaServiceOptions: {
         prismaOptions: {
           adapter: new PrismaPg({
@@ -59,6 +61,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
       },
     }),
     CqrsModule.forRoot(),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
