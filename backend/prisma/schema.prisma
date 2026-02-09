@@ -13,10 +13,34 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   name      String
-  email     String   @unique
+  email     String     @unique
   password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  cashFlows CashFlow[]
+
+  @@map("users")
+}
+
+model CashFlow {
+  id          String       @id @default(cuid())
+  userId      String       @map("user_id")
+  amount      Float
+  type        CashFlowType
+  description String?
+  date        DateTime     @default(now())
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("cash_flows")
+}
+
+enum CashFlowType {
+  INCOME
+  EXPENSE
 }
