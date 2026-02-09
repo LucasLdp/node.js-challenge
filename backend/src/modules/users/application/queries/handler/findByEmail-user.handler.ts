@@ -1,4 +1,4 @@
-import { IQueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { FindUserByEmailQuery } from '@/modules/users/application/queries/query';
 import { User } from '@/modules/users/domain/entities/user.entity';
 import { UserRepository } from '@/modules/users/domain/repositories/user.repository';
@@ -9,6 +9,7 @@ import { NotFoundException } from '@nestjs/common';
  * Verifica se o usuário existe e, se existir, retorna os dados do usuário.
  * Caso contrário, lança uma exceção de "Usuário não encontrado".
  */
+@QueryHandler(FindUserByEmailQuery)
 export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuery> {
   constructor(private readonly userRepository: UserRepository) {}
 
