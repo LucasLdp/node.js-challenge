@@ -160,13 +160,13 @@ describe('CashFlowsController', () => {
     });
   });
 
-  describe('PATCH /cash-flows/:id', () => {
+  describe('PUT /cash-flows/:id', () => {
     it('should update cash flow and return success message', async () => {
       const cashFlow = CashFlowFactory.create();
       commandBusMock.execute.mockResolvedValueOnce(cashFlow);
 
       const response = await request(server)
-        .patch(`/cash-flows/${cashFlow.id}`)
+        .put(`/cash-flows/${cashFlow.id}`)
         .send({ amount: 200 })
         .expect(200);
 
@@ -181,7 +181,7 @@ describe('CashFlowsController', () => {
       );
 
       const response = await request(server)
-        .patch('/cash-flows/non-existent-id')
+        .put('/cash-flows/non-existent-id')
         .send({ amount: 200 })
         .expect(404);
 
@@ -217,6 +217,42 @@ describe('CashFlowsController', () => {
       expect(response.body).toMatchObject({
         message: 'Transação não encontrada',
       });
+    });
+  });
+
+  describe('GET /cash-flows/balance/:userId', () => {
+    it('should return balance for user', async () => {
+      const userId = 'user-123';
+      const balance = {
+        totalIncome: 1000,
+        totalExpense: 300,
+        balance: 700,
+      };
+      queryBusMock.execute.mockResolvedValueOnce(balance);
+
+      const response = await request(server)
+        .get(`/cash-flows/balance/${userId}`)
+        .expect(200);
+
+      expect(response.body).toEqual(balance);
+    });
+
+    it('should return balance with date range filter', async () => {
+      const userId = 'user-123';
+      const balance = {
+        totalIncome: 500,
+        totalExpense: 200,
+        balance: 300,
+      };
+      queryBusMock.execute.mockResolvedValueOnce(balance);
+
+      const response = await request(server)
+        .get(
+          `/cash-flows/balance/${userId}?startDate=2026-01-01&endDate=2026-01-31`,
+        )
+        .expect(200);
+
+      expect(response.body).toEqual(balance);
     });
   });
 });
