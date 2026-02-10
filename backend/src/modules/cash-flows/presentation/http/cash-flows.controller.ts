@@ -6,6 +6,7 @@ import {
 import {
   FindByIdCashFlowQuery,
   FindAllByUserIdCashFlowQuery,
+  GetBalanceByUserIdCashFlowQuery,
 } from '@/modules/cash-flows/application/queries/query';
 import {
   CreateCashFlowDto,
@@ -80,6 +81,29 @@ export class CashFlowsController {
       dateRange,
     );
 
+    return await this.queryBus.execute(query);
+  }
+
+  @Get('balance/:userId')
+  @ApiOperation({ summary: 'Obter saldo do usuário' })
+  @ApiParam({ name: 'userId', type: 'string', description: 'ID do usuário' })
+  @ApiQuery({ name: 'startDate', required: false, type: 'string' })
+  @ApiQuery({ name: 'endDate', required: false, type: 'string' })
+  @ApiResponse({
+    status: 200,
+    description: 'Saldo do usuário',
+  })
+  async getBalance(
+    @Param('userId') userId: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const dateRange =
+      startDate && endDate
+        ? { start: new Date(startDate), end: new Date(endDate) }
+        : undefined;
+
+    const query = new GetBalanceByUserIdCashFlowQuery(userId, dateRange);
     return await this.queryBus.execute(query);
   }
 
