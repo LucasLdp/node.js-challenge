@@ -4,12 +4,17 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 /**
- * Use case para atualizar um usuário existente.
- * Verifica se o email fornecido já está em uso por outro usuário e se o usuário a ser atualizado existe.
- * Se as validações passarem, atualiza os dados do usuário com as informações fornecidas.
+ * Update an existing user. Validates if email is already in use by another user and throws ConflictException if so.
+ * Validates if the user to update exists and throws NotFoundException if not found.
+ * Otherwise, updates the user in the repository with the provided data.
+ *
+ * @param {UpdateUserCommand} command - The command containing user ID and data to update.
+ * @returns {Promise<void>} - A promise that resolves when the user is updated.
+ * @throws {ConflictException} - If the email is already in use by another user.
+ * @throws {NotFoundException} - If the user to update is not found in the repository.
  *  */
 @CommandHandler(UpdateUserCommand)
-export class UpdateUserUseCase implements ICommandHandler<UpdateUserCommand> {
+export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   constructor(private userRepository: UserRepository) {}
 
   async execute({ id, data }: UpdateUserCommand): Promise<void> {

@@ -5,12 +5,16 @@ import { ConflictException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { User } from '@/modules/users/domain/entities/user.entity';
 
-@CommandHandler(CreateUserCommand)
 /**
- * Use case para criar um novo usuário.
- * Verifica se o email já está em uso e, se não estiver, cria um novo usuário com os dados fornecidos.
+ * Create a new user. Validates if email is already in use and throws ConflictException if so.
+ * Otherwise, creates the user in the repository.
+ *
+ * @param {CreateUserCommand} command - The command containing user data to create.
+ * @returns {Promise<void>} - A promise that resolves when the user is created.
+ * @throws {ConflictException} - If the email is already in use by another user.
  *  */
-export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
+@CommandHandler(CreateUserCommand)
+export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(private userRepository: UserRepository) {}
 
   async execute({ data }: CreateUserCommand): Promise<void> {
