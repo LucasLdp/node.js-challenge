@@ -5,6 +5,7 @@ export class CashFlow {
       amount: number;
       type: 'INCOME' | 'EXPENSE';
       description: string | null;
+      date: Date;
       id?: string;
     },
   ) {}
@@ -27,5 +28,9 @@ export class CashFlow {
 
   get description(): string | null {
     return this.props.description;
+  }
+
+  get date(): Date {
+    return this.props.date;
   }
 }
