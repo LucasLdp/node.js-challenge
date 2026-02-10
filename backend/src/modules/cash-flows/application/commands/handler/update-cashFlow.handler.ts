@@ -15,6 +15,6 @@ export class UpdateCashFlowHandler implements ICommandHandler<UpdateCashFlowComm
       throw new NotFoundException('Transação não encontrada');
     }
 
-    return await this.cashFlowRepository.update(id, data);
+    return this.cashFlowRepository.update(id, data);
   }
 }
