@@ -9,6 +9,9 @@ import { CashFlowFactory } from 'test/factories/cash-flow.factory';
 import { NotFoundException } from '@nestjs/common';
 import { App } from 'supertest/types';
 
+// Mock do decorator @CurrentUser para injetar o userId nos testes
+const mockUserId = 'authenticated-user-id';
+
 describe('CashFlowsController', () => {
   let app: INestApplication;
   let server: App;
@@ -25,6 +28,19 @@ describe('CashFlowsController', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+
+    // Middleware para simular usuário autenticado
+    app.use(
+      (
+        req: { user: { userId: string; email: string } },
+        _res: unknown,
+        next: () => void,
+      ) => {
+        req.user = { userId: mockUserId, email: 'test@email.com' };
+        next();
+      },
+    );
+
     await app.init();
     server = app.getHttpServer() as App;
     mockReset(commandBusMock);
@@ -36,9 +52,8 @@ describe('CashFlowsController', () => {
   });
 
   describe('POST /cash-flows', () => {
-    it('should create cash flow and return success message', async () => {
+    it('should create cash flow using authenticated user id', async () => {
       const createDto = {
-        userId: 'clxxx123456789012345678',
         amount: 100.5,
         type: 'INCOME',
         description: 'Salary',
@@ -55,11 +70,11 @@ describe('CashFlowsController', () => {
       expect(response.body).toMatchObject({
         message: 'Transação criada com sucesso',
       });
+      expect(commandBusMock.execute).toHaveBeenCalled();
     });
 
     it('should return 404 when user not found', async () => {
       const createDto = {
-        userId: 'clxxx123456789012345678',
         amount: 100.5,
         type: 'INCOME',
         description: 'Salary',
@@ -81,40 +96,33 @@ describe('CashFlowsController', () => {
     });
   });
 
-  describe('GET /cash-flows/user/:userId', () => {
-    it('should return all cash flows for user', async () => {
-      const userId = 'user-123';
-      const cashFlows = CashFlowFactory.createMany(3, { userId });
+  describe('GET /cash-flows', () => {
+    it('should return all cash flows for authenticated user', async () => {
+      const cashFlows = CashFlowFactory.createMany(3, { userId: mockUserId });
       queryBusMock.execute.mockResolvedValueOnce(cashFlows);
 
-      const response = await request(server)
-        .get(`/cash-flows/user/${userId}`)
-        .expect(200);
+      const response = await request(server).get('/cash-flows').expect(200);
 
       expect(response.body).toHaveLength(3);
     });
 
     it('should return paginated cash flows', async () => {
-      const userId = 'user-123';
-      const cashFlows = CashFlowFactory.createMany(2, { userId });
+      const cashFlows = CashFlowFactory.createMany(2, { userId: mockUserId });
       queryBusMock.execute.mockResolvedValueOnce(cashFlows);
 
       const response = await request(server)
-        .get(`/cash-flows/user/${userId}?limit=2&page=1`)
+        .get('/cash-flows?limit=2&page=1')
         .expect(200);
 
       expect(response.body).toHaveLength(2);
     });
 
     it('should filter by date range', async () => {
-      const userId = 'user-123';
-      const cashFlows = CashFlowFactory.createMany(2, { userId });
+      const cashFlows = CashFlowFactory.createMany(2, { userId: mockUserId });
       queryBusMock.execute.mockResolvedValueOnce(cashFlows);
 
       const response = await request(server)
-        .get(
-          `/cash-flows/user/${userId}?startDate=2026-01-01&endDate=2026-01-31`,
-        )
+        .get('/cash-flows?startDate=2026-01-01&endDate=2026-01-31')
         .expect(200);
 
       expect(response.body).toHaveLength(2);
@@ -123,9 +131,7 @@ describe('CashFlowsController', () => {
     it('should return empty array when no cash flows exist', async () => {
       queryBusMock.execute.mockResolvedValueOnce([]);
 
-      const response = await request(server)
-        .get('/cash-flows/user/user-123')
-        .expect(200);
+      const response = await request(server).get('/cash-flows').expect(200);
 
       expect(response.body).toEqual([]);
     });
@@ -220,9 +226,8 @@ describe('CashFlowsController', () => {
     });
   });
 
-  describe('GET /cash-flows/balance/:userId', () => {
-    it('should return balance for user', async () => {
-      const userId = 'user-123';
+  describe('GET /cash-flows/balance', () => {
+    it('should return balance for authenticated user', async () => {
       const balance = {
         totalIncome: 1000,
         totalExpense: 300,
@@ -231,14 +236,13 @@ describe('CashFlowsController', () => {
       queryBusMock.execute.mockResolvedValueOnce(balance);
 
       const response = await request(server)
-        .get(`/cash-flows/balance/${userId}`)
+        .get('/cash-flows/balance')
         .expect(200);
 
       expect(response.body).toEqual(balance);
     });
 
     it('should return balance with date range filter', async () => {
-      const userId = 'user-123';
       const balance = {
         totalIncome: 500,
         totalExpense: 200,
@@ -247,9 +251,7 @@ describe('CashFlowsController', () => {
       queryBusMock.execute.mockResolvedValueOnce(balance);
 
       const response = await request(server)
-        .get(
-          `/cash-flows/balance/${userId}?startDate=2026-01-01&endDate=2026-01-31`,
-        )
+        .get('/cash-flows/balance?startDate=2026-01-01&endDate=2026-01-31')
         .expect(200);
 
       expect(response.body).toEqual(balance);

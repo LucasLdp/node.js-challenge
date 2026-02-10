@@ -13,6 +13,7 @@ import {
   UpdateCashFlowDto,
   ResponseCashFlowDto,
 } from '@/modules/cash-flows/presentation/dto';
+import { CurrentUser } from '@/modules/auth/infra/decorators/current-user.decorator';
 import {
   Controller,
   Get,
@@ -24,8 +25,17 @@ import {
   Put,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('Transações')
+@ApiBearerAuth()
 @Controller('cash-flows')
 export class CashFlowsController {
   constructor(
@@ -36,10 +46,13 @@ export class CashFlowsController {
   @Post()
   @ApiOperation({ summary: 'Criar nova transação' })
   @ApiResponse({ status: 201, description: 'Transação criada com sucesso' })
-  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
-  async create(@Body() createCashFlowDto: CreateCashFlowDto) {
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  async create(
+    @CurrentUser('userId') userId: string,
+    @Body() createCashFlowDto: CreateCashFlowDto,
+  ) {
     const command = new CreateCashFlowCommand({
-      userId: createCashFlowDto.userId,
+      userId,
       amount: createCashFlowDto.amount,
       type: createCashFlowDto.type,
       description: createCashFlowDto.description,
@@ -50,20 +63,40 @@ export class CashFlowsController {
     return { message: 'Transação criada com sucesso', data: result };
   }
 
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Listar transações do usuário' })
-  @ApiParam({ name: 'userId', type: 'string', description: 'ID do usuário' })
-  @ApiQuery({ name: 'limit', required: false, type: 'number' })
-  @ApiQuery({ name: 'page', required: false, type: 'number' })
-  @ApiQuery({ name: 'startDate', required: false, type: 'string' })
-  @ApiQuery({ name: 'endDate', required: false, type: 'string' })
+  @Get()
+  @ApiOperation({ summary: 'Listar transações do usuário autenticado' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Limite de resultados',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Página',
+  })
+  @ApiQuery({
+    name: 'startDate',
+    required: false,
+    type: String,
+    description: 'Data inicial (ISO 8601)',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: false,
+    type: String,
+    description: 'Data final (ISO 8601)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de transações',
     type: [ResponseCashFlowDto],
   })
-  async findAllByUserId(
-    @Param('userId') userId: string,
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  async findAll(
+    @CurrentUser('userId') userId: string,
     @Query('limit') limit?: number,
     @Query('page') page?: number,
     @Query('startDate') startDate?: string,
@@ -84,17 +117,27 @@ export class CashFlowsController {
     return await this.queryBus.execute(query);
   }
 
-  @Get('balance/:userId')
-  @ApiOperation({ summary: 'Obter saldo do usuário' })
-  @ApiParam({ name: 'userId', type: 'string', description: 'ID do usuário' })
-  @ApiQuery({ name: 'startDate', required: false, type: 'string' })
-  @ApiQuery({ name: 'endDate', required: false, type: 'string' })
+  @Get('balance')
+  @ApiOperation({ summary: 'Obter saldo do usuário autenticado' })
+  @ApiQuery({
+    name: 'startDate',
+    required: false,
+    type: String,
+    description: 'Data inicial (ISO 8601)',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: false,
+    type: String,
+    description: 'Data final (ISO 8601)',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Saldo do usuário',
+    description: 'Saldo calculado com totalIncome, totalExpense e balance',
   })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
   async getBalance(
-    @Param('userId') userId: string,
+    @CurrentUser('userId') userId: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
@@ -109,13 +152,14 @@ export class CashFlowsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar transação por ID' })
-  @ApiParam({ name: 'id', type: 'string', description: 'ID da transação' })
+  @ApiParam({ name: 'id', type: String, description: 'ID da transação' })
   @ApiResponse({
     status: 200,
     description: 'Transação encontrada',
     type: ResponseCashFlowDto,
   })
   @ApiResponse({ status: 404, description: 'Transação não encontrada' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
   async findOne(@Param('id') id: string) {
     const query = new FindByIdCashFlowQuery(id);
     return await this.queryBus.execute(query);
@@ -123,9 +167,10 @@ export class CashFlowsController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar transação' })
-  @ApiParam({ name: 'id', type: 'string', description: 'ID da transação' })
+  @ApiParam({ name: 'id', type: String, description: 'ID da transação' })
   @ApiResponse({ status: 200, description: 'Transação atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Transação não encontrada' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
   async update(
     @Param('id') id: string,
     @Body() updateCashFlowDto: UpdateCashFlowDto,
@@ -142,9 +187,10 @@ export class CashFlowsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar transação' })
-  @ApiParam({ name: 'id', type: 'string', description: 'ID da transação' })
+  @ApiParam({ name: 'id', type: String, description: 'ID da transação' })
   @ApiResponse({ status: 200, description: 'Transação removida com sucesso' })
   @ApiResponse({ status: 404, description: 'Transação não encontrada' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
   async remove(@Param('id') id: string) {
     const command = new DeleteCashFlowCommand(id);
     await this.commandBus.execute(command);
