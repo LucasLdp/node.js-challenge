@@ -4,6 +4,7 @@ export class User {
       name: string;
       email: string;
       password: string;
+      role: string;
       id?: string;
     },
   ) {}
@@ -24,6 +25,10 @@ export class User {
     return this.props.password;
   }
 
+  get role(): string {
+    return this.props.role;
+  }
+
   set name(name: string) {
     this.props.name = name;
   }
@@ -34,5 +39,9 @@ export class User {
 
   set password(password: string) {
     this.props.password = password;
+  }
+
+  set role(role: string) {
+    this.props.role = role;
   }
 }
