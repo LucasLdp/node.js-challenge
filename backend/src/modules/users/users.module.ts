@@ -6,13 +6,13 @@ import { PrismaUserRepository } from './infra/database/prisma-user.repository';
 import { UserRepository } from './domain/repositories/user.repository';
 
 const UserCommandHandlers = [
-  UserCommands.CreateUserUseCase,
-  UserCommands.UpdateUserUseCase,
+  UserCommands.CreateUserHandler,
+  UserCommands.UpdateUserHandler,
   UserCommands.DeleteUserHandler,
 ];
 
 const UserQueryHandlers = [
-  UserQueries.FindAllUsersUseCase,
+  UserQueries.FindAllUsersHandler,
   UserQueries.FindByIdUserHandler,
   UserQueries.FindUserByEmailHandler,
 ];
