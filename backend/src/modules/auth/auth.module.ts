@@ -1,5 +1,6 @@
 import { AuthService } from '@/modules/auth/application/services/auth.service';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt-auth.guard';
+import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { AuthController } from '@/modules/auth/presentation/http/auth.controller';
 import { UsersModule } from '@/modules/users/users.module';
 import { Module } from '@nestjs/common';
@@ -27,6 +28,10 @@ import { JwtModule } from '@nestjs/jwt';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
   exports: [AuthService],
