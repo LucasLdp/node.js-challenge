@@ -5,9 +5,11 @@ import { UserRepository } from '@/modules/users/domain/repositories/user.reposit
 import { NotFoundException } from '@nestjs/common';
 
 /**
- * Use case para encontrar um usuário por email.
- * Verifica se o usuário existe e, se existir, retorna os dados do usuário.
- * Caso contrário, lança uma exceção de "Usuário não encontrado".
+ * Query Handler to find a user by email.
+ * It retrieves the user from the repository based on the provided email.
+ *
+ * @param {FindUserByEmailQuery} query - The query containing the email to search for.
+ * @returns {Promise<User>} - A promise that resolves to the user with the specified email
  */
 @QueryHandler(FindUserByEmailQuery)
 export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuery> {

@@ -4,9 +4,11 @@ import { FindByIdUserQuery } from '@/modules/users/application/queries/query';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 /**
- * Use case para encontrar um usuário por ID.
- * Verifica se o usuário existe e, se existir, retorna os dados do usuário.
- * Caso contrário, lança uma exceção de "Usuário não encontrado".
+ * Query Handler to find a user by ID.
+ * It retrieves the user from the repository based on the provided ID.
+ *
+ * @param {FindByIdUserQuery} query - The query containing the ID to search for.
+ * @returns {Promise<User>} - A promise that resolves to the user with the specified ID
  */
 @QueryHandler(FindByIdUserQuery)
 export class FindByIdUserHandler implements IQueryHandler<FindByIdUserQuery> {
