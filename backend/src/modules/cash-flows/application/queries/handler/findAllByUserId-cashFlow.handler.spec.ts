@@ -1,6 +1,7 @@
 import { FindAllByUserIdCashFlowQuery } from '@/modules/cash-flows/application/queries/query';
 import { FindAllByUserIdCashFlowHandler } from '@/modules/cash-flows/application/queries/handler/findAllByUserId-cashFlow.handler';
 import { CashFlowRepository } from '@/modules/cash-flows/domain/repositories/cash-flow.repository';
+import { CacheService } from '@/shared/cache/cache.service';
 import { Test } from '@nestjs/testing';
 import { mock, mockReset } from 'vitest-mock-extended';
 import { CashFlowFactory } from 'test/factories/cash-flow.factory';
@@ -8,6 +9,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('FindAllByUserIdCashFlowHandler', () => {
   const cashFlowRepositoryMock = mock<CashFlowRepository>();
+  const cacheServiceMock = mock<CacheService>();
   let handler: FindAllByUserIdCashFlowHandler;
 
   beforeEach(async () => {
@@ -18,6 +20,10 @@ describe('FindAllByUserIdCashFlowHandler', () => {
           provide: CashFlowRepository,
           useValue: cashFlowRepositoryMock,
         },
+        {
+          provide: CacheService,
+          useValue: cacheServiceMock,
+        },
       ],
     }).compile();
 
@@ -25,6 +31,10 @@ describe('FindAllByUserIdCashFlowHandler', () => {
       FindAllByUserIdCashFlowHandler,
     );
     mockReset(cashFlowRepositoryMock);
+    mockReset(cacheServiceMock);
+
+    // Por padrão, executa o fetch
+    cacheServiceMock.getOrSet.mockImplementation(async ({ fetch }) => fetch());
   });
 
   it('should return paginated list of cash flows for user', async () => {
@@ -35,11 +45,11 @@ describe('FindAllByUserIdCashFlowHandler', () => {
     const query = new FindAllByUserIdCashFlowQuery(userId, 10, 1);
     const result = await handler.execute(query);
 
-    expect(cashFlowRepositoryMock.findAllByUserId).toHaveBeenCalledWith(
-      userId,
-      10,
-      1,
-      undefined,
+    expect(cacheServiceMock.getOrSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        key: `cash-flow:list:${userId}:1:10`,
+        ttl: 30000,
+      }),
     );
     expect(result).toEqual(cashFlows);
     expect(result).toHaveLength(3);
@@ -53,11 +63,10 @@ describe('FindAllByUserIdCashFlowHandler', () => {
     const query = new FindAllByUserIdCashFlowQuery(userId);
     const result = await handler.execute(query);
 
-    expect(cashFlowRepositoryMock.findAllByUserId).toHaveBeenCalledWith(
-      userId,
-      10,
-      1,
-      undefined,
+    expect(cacheServiceMock.getOrSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        key: `cash-flow:list:${userId}:1:10`,
+      }),
     );
     expect(result).toEqual(cashFlows);
   });
@@ -73,7 +82,7 @@ describe('FindAllByUserIdCashFlowHandler', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('should filter by date range when provided', async () => {
+  it('should skip cache when date range is provided', async () => {
     const userId = 'user-123';
     const dateRange = {
       start: new Date('2026-01-01'),
@@ -85,12 +94,8 @@ describe('FindAllByUserIdCashFlowHandler', () => {
     const query = new FindAllByUserIdCashFlowQuery(userId, 10, 1, dateRange);
     const result = await handler.execute(query);
 
-    expect(cashFlowRepositoryMock.findAllByUserId).toHaveBeenCalledWith(
-      userId,
-      10,
-      1,
-      { from: dateRange.start, to: dateRange.end },
-    );
+    const callArg = cacheServiceMock.getOrSet.mock.calls[0][0];
+    expect(callArg.skipWhen?.()).toBe(true);
     expect(result).toEqual(cashFlows);
   });
 });
