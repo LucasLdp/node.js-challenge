@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
 } from '@nestjs/common';
+import { Roles, Role } from '@/modules/auth/infra/decorators/roles.decorator';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -42,6 +43,7 @@ export class UsersController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiResponse({
     status: 200,
@@ -53,12 +55,13 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Buscar usuário por ID' })
   @ApiParam({ name: 'id', type: 'string', description: 'ID do usuário' })
   @ApiResponse({
     status: 200,
     description: 'Usuário encontrado',
-    type: UserResponseDto.Output,
+    type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async findOne(@Param('id') id: string) {
@@ -66,6 +69,7 @@ export class UsersController {
   }
 
   @Put(':id')
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Atualizar usuário' })
   @ApiParam({ name: 'id', type: 'string', description: 'ID do usuário' })
   @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso' })
@@ -76,6 +80,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Deletar usuário' })
   @ApiParam({ name: 'id', type: 'string', description: 'ID do usuário' })
   @ApiResponse({ status: 200, description: 'Usuário removido com sucesso' })

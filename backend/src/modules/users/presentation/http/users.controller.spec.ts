@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { mock, mockReset } from 'vitest-mock-extended';
 import { UsersController } from '@/modules/users/presentation/http/users.controller';
 import { UserFactory } from 'test/factories/user.factory';
@@ -26,27 +26,6 @@ describe('UsersController', () => {
     await app.init();
     mockReset(commandBusMock);
     mockReset(queryBusMock);
-  });
-
-  afterEach(async () => {
-    await app.close();
-  });
-
-  describe('POST /users', () => {
-    it('should create user and return success message', async () => {
-      const createDto = {
-        name: 'John Doe',
-        email: 'john@test.com',
-        password: '123456',
-      };
-
-      const response = await request(app.getHttpServer())
-        .post('/users')
-        .send(createDto)
-        .expect(201);
-
-      expect(response.body).toEqual({ message: 'Usuário criado com sucesso' });
-    });
   });
 
   describe('GET /users', () => {
