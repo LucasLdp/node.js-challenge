@@ -1,4 +1,4 @@
-import { CashFlow } from '@/cash-flows/domain/entities/cash-flow.entity';
+import { CashFlow } from '@/modules/cash-flows/domain/entities/cash-flow.entity';
 
 export abstract class CashFlowRepository {
   abstract findById(id: string): Promise<CashFlow | null>;
