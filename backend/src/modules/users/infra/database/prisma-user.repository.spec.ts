@@ -1,17 +1,17 @@
 import { PrismaUserRepository } from '@/modules/users/infra/database/prisma-user.repository';
 import { UserFactory } from 'test/factories/user.factory';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { describe, it, expect, beforeEach } from 'vitest';
 import createPrismaMock from 'prisma-mock/client';
 import { PrismaService } from 'nestjs-prisma';
 
 describe('PrismaUserRepository', () => {
   let repository: PrismaUserRepository;
-  let prisma: PrismaClient;
+  let prisma: PrismaService;
 
   beforeEach(() => {
     prisma = createPrismaMock(Prisma);
-    repository = new PrismaUserRepository(prisma as PrismaService);
+    repository = new PrismaUserRepository(prisma);
   });
 
   describe('create', () => {
@@ -83,16 +83,14 @@ describe('PrismaUserRepository', () => {
   describe('findAll', () => {
     it('should return paginated users', async () => {
       const users = UserFactory.createMany(5);
-      for (const user of users) {
-        await prisma.user.create({
-          data: {
-            id: user.id!,
-            name: user.name,
-            email: user.email,
-            password: user.password,
-          },
-        });
-      }
+      await prisma.user.createMany({
+        data: users.map((user) => ({
+          id: user.id!,
+          name: user.name,
+          email: user.email,
+          password: user.password,
+        })),
+      });
 
       const result = await repository.findAll(3, 1);
 
@@ -101,20 +99,34 @@ describe('PrismaUserRepository', () => {
 
     it('should return correct page', async () => {
       const users = UserFactory.createMany(5);
-      for (const user of users) {
-        await prisma.user.create({
-          data: {
-            id: user.id!,
-            name: user.name,
-            email: user.email,
-            password: user.password,
-          },
-        });
-      }
+      await prisma.user.createMany({
+        data: users.map((user) => ({
+          id: user.id!,
+          name: user.name,
+          email: user.email,
+          password: user.password,
+        })),
+      });
 
       const result = await repository.findAll(3, 2);
 
       expect(result).toHaveLength(2);
+    });
+
+    it('should return empty array when page exceeds total', async () => {
+      const users = UserFactory.createMany(3);
+      await prisma.user.createMany({
+        data: users.map((user) => ({
+          id: user.id!,
+          name: user.name,
+          email: user.email,
+          password: user.password,
+        })),
+      });
+
+      const result = await repository.findAll(10, 2);
+
+      expect(result).toHaveLength(0);
     });
   });
 
