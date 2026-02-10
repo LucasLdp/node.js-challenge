@@ -1,4 +1,4 @@
-import { PrismaCashFlowRepository } from '@/cash-flows/infra/database/prisma-cash-flow.repository';
+import { PrismaCashFlowRepository } from '@/modules/cash-flows/infra/database/prisma-cash-flow.repository';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import createPrismaMock from 'prisma-mock/client';
@@ -39,6 +39,7 @@ describe('PrismaCashFlowRepository', () => {
           amount: cashFlow.amount,
           type: cashFlow.type,
           userId: cashFlow.userId,
+          date: cashFlow.date,
         },
       });
 
@@ -66,6 +67,7 @@ describe('PrismaCashFlowRepository', () => {
           amount: cf.amount,
           type: cf.type,
           userId: cf.userId,
+          date: cf.date,
         })),
       });
 
@@ -73,6 +75,44 @@ describe('PrismaCashFlowRepository', () => {
 
       expect(result).toHaveLength(3);
       expect(result[0].userId).toBe(userId);
+    });
+
+    it('should return paginated cash flows', async () => {
+      const userId = 'shared-user-id';
+      const cashFlows = CashFlowFactory.createMany(5, { userId });
+
+      await prisma.cashFlow.createMany({
+        data: cashFlows.map((cf) => ({
+          id: cf.id!,
+          amount: cf.amount,
+          type: cf.type,
+          userId: cf.userId,
+          date: cf.date,
+        })),
+      });
+
+      const result = await repository.findAllByUserId(userId, 3, 1);
+
+      expect(result).toHaveLength(3);
+    });
+
+    it('should return correct page of cash flows', async () => {
+      const userId = 'shared-user-id';
+      const cashFlows = CashFlowFactory.createMany(5, { userId });
+
+      await prisma.cashFlow.createMany({
+        data: cashFlows.map((cf) => ({
+          id: cf.id!,
+          amount: cf.amount,
+          type: cf.type,
+          userId: cf.userId,
+          date: cf.date,
+        })),
+      });
+
+      const result = await repository.findAllByUserId(userId, 3, 2);
+
+      expect(result).toHaveLength(2);
     });
 
     it('should return empty array when no cash flows found', async () => {
@@ -91,6 +131,7 @@ describe('PrismaCashFlowRepository', () => {
           amount: cashFlow.amount,
           type: cashFlow.type,
           userId: cashFlow.userId,
+          date: cashFlow.date,
         },
       });
 
@@ -115,6 +156,7 @@ describe('PrismaCashFlowRepository', () => {
           amount: cashFlow.amount,
           type: cashFlow.type,
           userId: cashFlow.userId,
+          date: cashFlow.date,
         },
       });
 
