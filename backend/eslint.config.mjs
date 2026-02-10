@@ -1,4 +1,3 @@
-// .eslintrc.js
 import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
@@ -6,11 +5,19 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'vitest.config.ts', 'vitest.config.e2e.ts'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
+
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+
   {
     languageOptions: {
       globals: {
@@ -35,7 +42,6 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
-
       'no-restricted-imports': [
         'error',
         {
