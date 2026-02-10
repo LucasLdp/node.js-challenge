@@ -24,8 +24,7 @@ import { validateEnvFunction } from '@/config/env-validation';
 import { PrismaModule } from 'nestjs-prisma';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { UsersModule, CashFlowsModule } from '@/modules';
-import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule, CashFlowsModule, AuthModule } from '@/modules';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
