@@ -9,7 +9,6 @@ import { CashFlowFactory } from 'test/factories/cash-flow.factory';
 import { NotFoundException } from '@nestjs/common';
 import { App } from 'supertest/types';
 
-// Mock do decorator @CurrentUser para injetar o userId nos testes
 const mockUserId = 'authenticated-user-id';
 
 describe('CashFlowsController', () => {
@@ -29,7 +28,6 @@ describe('CashFlowsController', () => {
 
     app = moduleRef.createNestApplication();
 
-    // Middleware para simular usuário autenticado
     app.use(
       (
         req: { user: { userId: string; email: string } },
