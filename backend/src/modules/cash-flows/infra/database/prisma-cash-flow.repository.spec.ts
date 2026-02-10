@@ -169,4 +169,80 @@ describe('PrismaCashFlowRepository', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('getBalanceByUserId', () => {
+    it('should return correct balance using aggregate', async () => {
+      const userId = 'balance-user-id';
+      const incomes = CashFlowFactory.createMany(2, {
+        userId,
+        type: 'INCOME',
+        amount: 500,
+      });
+      const expenses = CashFlowFactory.createMany(1, {
+        userId,
+        type: 'EXPENSE',
+        amount: 200,
+      });
+
+      await prisma.cashFlow.createMany({
+        data: [...incomes, ...expenses].map((cf) => ({
+          id: cf.id!,
+          amount: cf.amount,
+          type: cf.type,
+          userId: cf.userId,
+          date: cf.date,
+        })),
+      });
+
+      const result = await repository.getBalanceByUserId(userId);
+
+      expect(result.totalIncome).toBe(1000);
+      expect(result.totalExpense).toBe(200);
+      expect(result.balance).toBe(800);
+    });
+
+    it('should return zero balance when no transactions', async () => {
+      const result = await repository.getBalanceByUserId(
+        'no-transactions-user',
+      );
+
+      expect(result.totalIncome).toBe(0);
+      expect(result.totalExpense).toBe(0);
+      expect(result.balance).toBe(0);
+    });
+
+    it('should filter by date range', async () => {
+      const userId = 'date-range-user';
+      const oldTransaction = CashFlowFactory.create({
+        userId,
+        type: 'INCOME',
+        amount: 1000,
+        date: new Date('2025-01-01'),
+      });
+      const newTransaction = CashFlowFactory.create({
+        userId,
+        type: 'INCOME',
+        amount: 500,
+        date: new Date('2026-02-01'),
+      });
+
+      await prisma.cashFlow.createMany({
+        data: [oldTransaction, newTransaction].map((cf) => ({
+          id: cf.id!,
+          amount: cf.amount,
+          type: cf.type,
+          userId: cf.userId,
+          date: cf.date,
+        })),
+      });
+
+      const result = await repository.getBalanceByUserId(userId, {
+        from: new Date('2026-01-01'),
+        to: new Date('2026-12-31'),
+      });
+
+      expect(result.totalIncome).toBe(500);
+      expect(result.balance).toBe(500);
+    });
+  });
 });
