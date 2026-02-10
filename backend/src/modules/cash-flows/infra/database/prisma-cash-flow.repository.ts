@@ -1,5 +1,5 @@
-import { CashFlow } from '@/cash-flows/domain/entities/cash-flow.entity';
-import { CashFlowRepository } from '@/cash-flows/domain/repositories/cash-flow.repository';
+import { CashFlow } from '@/modules/cash-flows/domain/entities/cash-flow.entity';
+import { CashFlowRepository } from '@/modules/cash-flows/domain/repositories/cash-flow.repository';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 
@@ -20,6 +20,7 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
       amount: cashFlow.amount,
       description: cashFlow.description,
       type: cashFlow.type,
+      date: cashFlow.date,
     });
   }
 
@@ -32,7 +33,7 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
     const cashFlows = await this.prisma.cashFlow.findMany({
       where: {
         userId,
-        createdAt: dateRange
+        date: dateRange
           ? {
               gte: dateRange.from,
               lte: dateRange.to,
@@ -51,6 +52,7 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
           amount: cashFlow.amount,
           description: cashFlow.description,
           type: cashFlow.type,
+          date: cashFlow.date,
         }),
     );
   }
@@ -62,6 +64,7 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
         amount: cashFlow.amount,
         description: cashFlow.description,
         type: cashFlow.type,
+        date: cashFlow.date,
       },
     });
 
@@ -71,6 +74,7 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
       amount: createdCashFlow.amount,
       description: createdCashFlow.description,
       type: createdCashFlow.type,
+      date: createdCashFlow.date,
     });
   }
 
@@ -81,6 +85,7 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
         amount: cashFlow.amount,
         description: cashFlow.description,
         type: cashFlow.type,
+        date: cashFlow.date,
       },
     });
 
@@ -90,6 +95,7 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
       amount: updatedCashFlow.amount,
       description: updatedCashFlow.description,
       type: updatedCashFlow.type,
+      date: updatedCashFlow.date,
     });
   }
 
