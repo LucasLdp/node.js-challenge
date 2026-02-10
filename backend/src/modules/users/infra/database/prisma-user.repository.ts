@@ -21,6 +21,7 @@ export class PrismaUserRepository implements UserRepository {
           name: user.name,
           email: user.email,
           password: user.password,
+          role: user.role,
         }),
     );
   }
@@ -32,6 +33,7 @@ export class PrismaUserRepository implements UserRepository {
         name: user.name,
         email: user.email,
         password: user.password,
+        role: user.role,
       },
     });
   }
@@ -48,6 +50,7 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
+      role: user.role,
     });
   }
 
@@ -63,6 +66,7 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
+      role: user.role,
     });
   }
 
