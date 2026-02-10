@@ -1,7 +1,8 @@
+version: '3.8'
+
 services:
-  postgres:
-    image: bitnami/postgresql:16
-    container_name: kinvo-postgres
+  kinvo_db:
+    image: bitnami/postgresql:latest
     ports:
       - '5432:5432'
     environment:
@@ -9,36 +10,36 @@ services:
       - POSTGRESQL_PASSWORD=password
       - POSTGRESQL_DATABASE=kinvo_db
     volumes:
-      - postgres_data:/bitnami/postgresql
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d kinvo_db']
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - kinvo_db_data:/bitnami/postgresql
 
-  redis:
-    image: bitnami/redis:7.4
-    container_name: kinvo-redis
+  kinvo_redis:
+    image: bitnami/redis:latest
     ports:
       - '6379:6379'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     volumes:
-      - redis_data:/bitnami/redis/data
+      - kinvo_redis_data:/bitnami/redis/data
 
-  migrate:
-    image: node:24-alpine
-    container_name: kinvo-migrate
-    working_dir: /app
-    volumes:
-      - .:/app
+  kinvo_challenge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3333:3333'
     environment:
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/kinvo_db
-    command: sh -c "npm install -g pnpm && pnpm install && pnpm prisma migrate deploy"
+      - DATABASE_URL=postgresql://postgres:password@kinvo_db:5432/kinvo_db
+      - REDIS_URL=redis://kinvo_redis:6379
+      - JWT_SECRET=your_jwt_secret_key
+      - JWT_EXPIRES_IN=1d
+      - CACHE_TTL=3600
+      - PORT=3333
+      - NODE_ENV=production
     depends_on:
-      postgres:
-        condition: service_healthy
+      - kinvo_db
+      - kinvo_redis
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-  redis_data:
+  kinvo_db_data:
+  kinvo_redis_data:
