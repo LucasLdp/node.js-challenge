@@ -33,7 +33,6 @@ describe('FindAllByUserIdCashFlowHandler', () => {
     mockReset(cashFlowRepositoryMock);
     mockReset(cacheServiceMock);
 
-    // Por padrão, executa o fetch
     cacheServiceMock.getOrSet.mockImplementation(async ({ fetch }) => fetch());
   });
 
