@@ -14,6 +14,7 @@ export interface AuthResult {
     id: string;
     name: string;
     email: string;
+    role: string;
   };
 }
 
@@ -39,7 +40,7 @@ export class AuthService {
       throw new Error('Usuário sem ID');
     }
 
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = await this.jwtService.signAsync(payload);
 
     return {
@@ -48,6 +49,7 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     };
   }
