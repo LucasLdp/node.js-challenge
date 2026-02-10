@@ -3,11 +3,6 @@ import { PrismaService } from 'nestjs-prisma';
 import { UserRepository } from '@modules/users/domain/repositories/user.repository';
 import { User } from '@modules/users/domain/entities/user.entity';
 
-/**
- * Repositório de usuários usando Prisma.
- * Implementa a interface UserRepository para fornecer métodos de acesso aos dados dos usuários no banco de dados.
- * Utiliza o PrismaService para realizar operações de leitura e escrita no banco de dados.
- */
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prisma: PrismaService) {}
