@@ -19,7 +19,18 @@ async function bootstrap() {
 
   z.config(z.locales.pt());
 
-  SwaggerModule.setup('api', app, cleanupOpenApiDoc(openApiDoc));
+  const cleanedDoc = cleanupOpenApiDoc(openApiDoc);
+
+  SwaggerModule.setup('api', app, cleanedDoc, {
+    jsonDocumentUrl: '/api-json',
+    yamlDocumentUrl: '/api-yaml',
+    swaggerOptions: {
+      urls: [
+        { url: '/api-json', name: 'JSON' },
+        { url: '/api-yaml', name: 'YAML' },
+      ],
+    },
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
