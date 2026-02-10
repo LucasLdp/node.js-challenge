@@ -25,6 +25,7 @@ import { PrismaModule } from 'nestjs-prisma';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { UsersModule, CashFlowsModule } from '@/modules';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Catch(HttpException)
 class HttpExceptionFilter extends BaseExceptionFilter {
@@ -63,6 +64,7 @@ class HttpExceptionFilter extends BaseExceptionFilter {
     CqrsModule.forRoot(),
     UsersModule,
     CashFlowsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

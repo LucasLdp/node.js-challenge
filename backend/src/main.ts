@@ -11,8 +11,9 @@ async function bootstrap() {
     app,
     new DocumentBuilder()
       .setTitle('Kinvo Challenge API')
-      .setDescription('API for Kinvo Challenge')
+      .setDescription('API de controle de fluxo de caixa')
       .setVersion('1.0')
+      .addBearerAuth()
       .build(),
   );
 
