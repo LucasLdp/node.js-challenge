@@ -5,17 +5,8 @@ import * as UserQueries from '@modules/users/application/queries/handler';
 import { PrismaUserRepository } from './infra/database/prisma-user.repository';
 import { UserRepository } from './domain/repositories/user.repository';
 
-const UserCommandHandlers = [
-  UserCommands.CreateUserHandler,
-  UserCommands.UpdateUserHandler,
-  UserCommands.DeleteUserHandler,
-];
-
-const UserQueryHandlers = [
-  UserQueries.FindAllUsersHandler,
-  UserQueries.FindByIdUserHandler,
-  UserQueries.FindUserByEmailHandler,
-];
+const UserCommandHandlers = Object.values(UserCommands);
+const UserQueryHandlers = Object.values(UserQueries);
 
 const UserProvider: Provider[] = [
   {
@@ -27,5 +18,6 @@ const UserProvider: Provider[] = [
 @Module({
   controllers: [UsersController],
   providers: [...UserCommandHandlers, ...UserQueryHandlers, ...UserProvider],
+  exports: [UserRepository],
 })
 export class UsersModule {}
