@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: bitnami/postgresql:16
+    container_name: kinvo-postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DATABASE=kinvo_db
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d kinvo_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: bitnami/redis:7.4
+    container_name: kinvo-redis
+    ports:
+      - '6379:6379'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis_data:/bitnami/redis/data
+
+  migrate:
+    image: node:24-alpine
+    container_name: kinvo-migrate
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/kinvo_db
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm prisma migrate deploy"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
