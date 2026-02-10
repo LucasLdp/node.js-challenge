@@ -1,12 +1,11 @@
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, NotFoundException } from '@nestjs/common';
 import request from 'supertest';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mock, mockReset } from 'vitest-mock-extended';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CashFlowsController } from '@/modules/cash-flows/presentation/http/cash-flows.controller';
 import { CashFlowFactory } from 'test/factories/cash-flow.factory';
-import { NotFoundException } from '@nestjs/common';
 import { App } from 'supertest/types';
 
 const mockUserId = 'authenticated-user-id';
@@ -27,18 +26,10 @@ describe('CashFlowsController', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-
-    app.use(
-      (
-        req: { user: { userId: string; email: string } },
-        _res: unknown,
-        next: () => void,
-      ) => {
-        req.user = { userId: mockUserId, email: 'test@email.com' };
-        next();
-      },
-    );
-
+    app.use((req: any, _res: any, next: any) => {
+      req.user = { userId: mockUserId, email: 'test@email.com', role: 'user' };
+      next();
+    });
     await app.init();
     server = app.getHttpServer() as App;
     mockReset(commandBusMock);

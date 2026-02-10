@@ -14,6 +14,7 @@ import {
   ResponseCashFlowDto,
 } from '@/modules/cash-flows/presentation/dto';
 import { CurrentUser } from '@/modules/auth/infra/decorators/current-user.decorator';
+import { Roles, Role } from '@/modules/auth/infra/decorators/roles.decorator';
 import {
   Controller,
   Get,
@@ -44,6 +45,7 @@ export class CashFlowsController {
   ) {}
 
   @Post()
+  @Roles(Role.USER, Role.ADMIN)
   @ApiOperation({ summary: 'Criar nova transação' })
   @ApiResponse({ status: 201, description: 'Transação criada com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
@@ -64,6 +66,7 @@ export class CashFlowsController {
   }
 
   @Get()
+  @Roles(Role.USER, Role.ADMIN)
   @ApiOperation({ summary: 'Listar transações do usuário autenticado' })
   @ApiQuery({
     name: 'limit',
@@ -81,13 +84,17 @@ export class CashFlowsController {
     name: 'startDate',
     required: false,
     type: String,
-    description: 'Data inicial (ISO 8601)',
+    format: 'date-time',
+    default: new Date().toISOString(),
+    description: 'Data inicial',
   })
   @ApiQuery({
     name: 'endDate',
     required: false,
     type: String,
-    description: 'Data final (ISO 8601)',
+    format: 'date-time',
+    default: new Date().toISOString(),
+    description: 'Data final',
   })
   @ApiResponse({
     status: 200,
@@ -118,6 +125,7 @@ export class CashFlowsController {
   }
 
   @Get('balance')
+  @Roles(Role.USER, Role.ADMIN)
   @ApiOperation({ summary: 'Obter saldo do usuário autenticado' })
   @ApiQuery({
     name: 'startDate',
@@ -151,6 +159,7 @@ export class CashFlowsController {
   }
 
   @Get(':id')
+  @Roles(Role.USER, Role.ADMIN)
   @ApiOperation({ summary: 'Buscar transação por ID' })
   @ApiParam({ name: 'id', type: String, description: 'ID da transação' })
   @ApiResponse({
@@ -166,6 +175,7 @@ export class CashFlowsController {
   }
 
   @Put(':id')
+  @Roles(Role.USER, Role.ADMIN)
   @ApiOperation({ summary: 'Atualizar transação' })
   @ApiParam({ name: 'id', type: String, description: 'ID da transação' })
   @ApiResponse({ status: 200, description: 'Transação atualizada com sucesso' })
@@ -186,6 +196,7 @@ export class CashFlowsController {
   }
 
   @Delete(':id')
+  @Roles(Role.USER, Role.ADMIN)
   @ApiOperation({ summary: 'Deletar transação' })
   @ApiParam({ name: 'id', type: String, description: 'ID da transação' })
   @ApiResponse({ status: 200, description: 'Transação removida com sucesso' })
