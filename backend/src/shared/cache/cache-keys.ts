@@ -6,7 +6,7 @@ export const CacheKeys = {
 } as const;
 
 export const CacheTTL = {
-  BALANCE: 30000, // 30 segundos
-  CASH_FLOWS: 30000, // 30 segundos
-  CASH_FLOW: 60000, // 1 minuto
+  BALANCE: 30000,
+  CASH_FLOWS: 30000,
+  CASH_FLOW: 60000,
 } as const;
