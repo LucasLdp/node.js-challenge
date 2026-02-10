@@ -1,5 +1,8 @@
 import { CashFlow } from '@/modules/cash-flows/domain/entities/cash-flow.entity';
-import { CashFlowRepository } from '@/modules/cash-flows/domain/repositories/cash-flow.repository';
+import {
+  CashFlowBalance,
+  CashFlowRepository,
+} from '@/modules/cash-flows/domain/repositories/cash-flow.repository';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 
@@ -103,5 +106,40 @@ export class PrismaCashFlowRepository implements CashFlowRepository {
     await this.prisma.cashFlow.delete({
       where: { id },
     });
+  }
+
+  async getBalanceByUserId(
+    userId: string,
+    dateRange?: { from: Date; to: Date },
+  ): Promise<CashFlowBalance> {
+    const whereClause = {
+      userId,
+      date: dateRange
+        ? {
+            gte: dateRange.from,
+            lte: dateRange.to,
+          }
+        : undefined,
+    };
+
+    const [incomeResult, expenseResult] = await Promise.all([
+      this.prisma.cashFlow.aggregate({
+        where: { ...whereClause, type: 'INCOME' },
+        _sum: { amount: true },
+      }),
+      this.prisma.cashFlow.aggregate({
+        where: { ...whereClause, type: 'EXPENSE' },
+        _sum: { amount: true },
+      }),
+    ]);
+
+    const totalIncome = incomeResult._sum.amount ?? 0;
+    const totalExpense = expenseResult._sum.amount ?? 0;
+
+    return {
+      totalIncome,
+      totalExpense,
+      balance: totalIncome - totalExpense,
+    };
   }
 }
