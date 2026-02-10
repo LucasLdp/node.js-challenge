@@ -2,7 +2,7 @@ import { createZodDto } from 'nestjs-zod';
 import z from 'zod';
 
 const UserResponseSchema = z.object({
-  id: z.uuid(),
+  id: z.cuid(),
   name: z.string(),
   email: z.email(),
   createdAt: z.iso.datetime(),
