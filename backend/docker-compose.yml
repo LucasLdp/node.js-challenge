@@ -42,4 +42,6 @@ services:
 
 volumes:
   kinvo_db_data:
+    name: kinvo_db_data # Nome fixo
   kinvo_redis_data:
+    name: kinvo_redis_data # Nome fixo
