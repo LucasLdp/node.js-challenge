@@ -18,7 +18,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(private userRepository: UserRepository) {}
 
   async execute({ data }: CreateUserCommand): Promise<void> {
-    const { name, email, password } = data;
+    const { name, email, password, role } = data;
     const existingUser = await this.userRepository.findByEmail(email);
 
     if (existingUser) {
@@ -29,6 +29,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       name,
       email,
       password,
+      role,
     });
 
     await this.userRepository.create(user);

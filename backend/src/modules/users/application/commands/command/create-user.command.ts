@@ -6,6 +6,7 @@ export class CreateUserCommand extends Command<void> {
       name: string;
       email: string;
       password: string;
+      role?: 'ADMIN' | 'USER';
     },
   ) {
     super();
