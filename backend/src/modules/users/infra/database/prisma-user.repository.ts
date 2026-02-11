@@ -21,7 +21,7 @@ export class PrismaUserRepository implements UserRepository {
           name: user.name,
           email: user.email,
           password: user.password,
-          role: user.role,
+          role: user.role ?? undefined,
         }),
     );
   }
@@ -33,7 +33,7 @@ export class PrismaUserRepository implements UserRepository {
         name: user.name,
         email: user.email,
         password: user.password,
-        role: user.role,
+        role: user.role as any,
       },
     });
   }
@@ -50,7 +50,7 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
-      role: user.role,
+      role: user.role ?? undefined,
     });
   }
 
@@ -66,7 +66,7 @@ export class PrismaUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
-      role: user.role,
+      role: user.role ?? undefined,
     });
   }
 
@@ -77,7 +77,12 @@ export class PrismaUserRepository implements UserRepository {
 
     await this.prisma.user.update({
       where: { id },
-      data: user,
+      data: {
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        role: user.role as any,
+      },
     });
   }
 
