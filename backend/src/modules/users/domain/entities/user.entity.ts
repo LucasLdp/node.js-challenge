@@ -4,7 +4,7 @@ export class User {
       name: string;
       email: string;
       password: string;
-      role: string;
+      role?: string;
       id?: string;
     },
   ) {}
@@ -25,7 +25,7 @@ export class User {
     return this.props.password;
   }
 
-  get role(): string {
+  get role(): string | undefined {
     return this.props.role;
   }
 
@@ -41,7 +41,7 @@ export class User {
     this.props.password = password;
   }
 
-  set role(role: string) {
+  set role(role: string | undefined) {
     this.props.role = role;
   }
 }
