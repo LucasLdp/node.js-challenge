@@ -32,7 +32,7 @@ export class JwtAuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Não autorizado');
     }
 
     try {
@@ -45,7 +45,7 @@ export class JwtAuthGuard implements CanActivate {
         role: payload.role,
       };
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Não autorizado: acesso inválido');
     }
 
     return true;
