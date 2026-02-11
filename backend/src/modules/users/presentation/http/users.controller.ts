@@ -24,8 +24,14 @@ import {
   FindByIdUserQuery,
   ListAllUserQuery,
 } from '@/modules/users/application/queries/query';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(
