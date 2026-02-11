@@ -1,74 +1,77 @@
 > ![Logo Kinvo](https://github.com/cbfranca/kinvo-front-end-test/blob/master/logo.svg)
 
+# 💸 Kinvo - Desafio Back-end
 
-# Kinvo - Desafio Back-end
+Este projeto foi desenvolvido como solução para o **Desafio Back-end Kinvo**, com foco em controle de finanças pessoais, seguindo as melhores práticas de arquitetura, testes, segurança, cache e deploy.
 
-## Instruções
+---
 
-- Utilize Typescript com Node;
-- Desenvolva uma API REST ou GraphQL;
-- Fique à vontade para escolher as libs, arquitetura, frameworks, banco de dados e etc.;
-- Crie um arquivo README com instruções para executar seu projeto;
-- Crie a collection do Insomnia ou Postman, salve com o nome "collection".
+## 🚀 Sobre o Desafio
 
-## Contexto
+O objetivo é criar uma API robusta para controle de movimentações financeiras (receitas e despesas), com autenticação, filtros, paginação, exibição de saldo e diferenciais como cache e Docker. O desafio avalia não só o cumprimento dos requisitos, mas principalmente a qualidade das decisões técnicas.
 
-Um estudante a fim de poupar gastos e controlar suas finanças pessoais resolveu desenvolver um aplicativo para lhe ajudar nessa missão. Após um estudo de caso ele mapeou as seguintes funcionalidades:
+---
 
-- Criação da movimentação (receitas e despesas);
-- Atualização da movimentação;
-- Exclusão da movimentação;
-- Listagem de movimentações;
-- Exibição do saldo.
+## 🏗️ Arquitetura & Tecnologias
 
-## Requisitos
+- **Node.js + TypeScript**: Base moderna e tipada.
+- **NestJS**: Framework modular, escalável e com suporte a injeção de dependências, CQRS e validação.
+- **Prisma ORM**: Integração eficiente com PostgreSQL.
+- **Redis**: Cache distribuído para performance.
+- **Docker & Docker Compose**: Padronização do ambiente e fácil deploy.
+- **Vitest**: Testes unitários e E2E rápidos e modernos.
+- **Swagger**: Documentação automática e interativa da API.
+- **SOLID & Clean Code**: Estrutura orientada a domínio, separação de responsabilidades e fácil manutenção.
 
-### Desenvolvedor Júnior
+---
 
-- Filtro na listagem de movimentações por data (data inicial e data final);
-- Paginação na listagem de movimentações.
+## 🔒 Autenticação & Segurança
 
-### Desenvolvedor Pleno
+- **JWT**: Autenticação segura via tokens.
+- **Cadastro e login de usuários**.
+- **Proteção de rotas**: Apenas usuários autenticados podem acessar recursos sensíveis.
+- **Validação de dados**: Zod + pipes globais para garantir integridade.
+- **Boas práticas de tratamento de erros**.
 
-- Todos os requisitos do Júnior;
-- API Rest semântica (se escolheu desenvolver uma API Rest);
-- Arquitetura minimamente escalável;
-- Cobertura mínima de testes automatizados.
+---
 
-### Desenvolvedor Sênior
+## ⚡ Cache Inteligente
 
-- Todos os requisitos do Pleno;
-- Autenticação:
-  - Cadastro de usuário;
-  - Login;
-  - Necessidade do usuário estar autenticado para a realização das atividades citadas no contexto.
-- Dockerizar a aplicação;
-- Boas práticas de POO (Exemplos: SOLID, Design Patterns, etc.).
+- **Cache global com Redis**: Reduz consultas repetidas ao banco, melhora a performance.
+- **Cache granular**: Listagem e saldo de movimentações são cacheados por usuário/página.
+- **Bypass automático**: Cache é ignorado quando há filtros por data, garantindo dados sempre atualizados.
 
-### Diferenciais
+---
 
-- Cache;
-- Segurança da aplicação;
-- Deploy.
+## 🧪 Testes Automatizados
 
-## Dicas
+- **Cobertura de testes unitários e E2E** com Vitest.
+- **Factories** para geração de dados de teste realistas.
+- **Mocks** para isolamento de dependências (ex: cache, repositórios).
+- **Testes de autenticação, cadastro, login, movimentações, filtros, paginação e saldo**.
+- **Cobertura de erros e fluxos alternativos**.
 
-- Se optar por uma API REST, tenha cuidado ao definir as rotas e verbos HTTP: faça uso de boas práticas;
-- Crie uma aplicação flexível, ou seja, que seja fácil incluir novas funcionalidades;
-- Clean Code: o código deve ser fácil de entender;
-- Atente-se a boas práticas de versionamento.
+---
 
-## Processo de submissão
+## 🐳 Docker & Deploy
 
-1. Faça o fork deste repositório;
-2. Faça seu projeto neste fork;
-3. Suba as alterações para o seu fork;
-4. Submeta uma PR para este repositório.
+- **Dockerfile**: Build otimizado, ambiente isolado.
+- **docker-compose.yml**: Orquestração de app, banco PostgreSQL e Redis.
+- **Variáveis de ambiente**: Configuração flexível para produção e desenvolvimento.
+- **Pronto para deploy em qualquer ambiente Docker**.
 
-## Observações:
+---
 
-* O cumprimento dos requisitos solicitados para uma vaga em determinado nível não é garantia de aprovação. <strong>Focamos em avaliar a forma como os requisitos foram cumpridos.</strong>
-* Apesar da listagem de requisitos mínimos acima, caso não tenha tido tempo suficiente ou tenha se esbarrado em alguma dificuldade, entregue o desafio ainda que incompleto e conte-nos na descrição do pull request quais foram as suas maiores dificuldades. Não se preocupe, avaliaremos ainda assim! :)
-* Está com alguma dificuldade, encontrou algum problema no desafio ou tem alguma sugestão pra gente? Crie uma issue e descreva o que achar necessário ou entre em contato.
+## 📚 Documentação & Uso
 
-### Boa sorte! 🍀
+- **Swagger**: Acesse `/docs` após subir o projeto para explorar e testar todos os endpoints.
+
+---
+
+## 🛠️ Como rodar o projeto
+
+1. **Clone o repositório**
+2. **Configure o `.env`** (baseado no `.env.example`)
+3. **Suba com Docker Compose**:
+   ```sh
+   docker-compose up --build
