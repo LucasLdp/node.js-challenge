@@ -2,6 +2,7 @@ import { cleanupOpenApiDoc } from 'nestjs-zod';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { apiReference } from '@scalar/nestjs-api-reference';
 import z from 'zod';
 
 async function bootstrap() {
@@ -21,16 +22,8 @@ async function bootstrap() {
 
   const cleanedDoc = cleanupOpenApiDoc(openApiDoc);
 
-  SwaggerModule.setup('api', app, cleanedDoc, {
-    jsonDocumentUrl: '/api-json',
-    yamlDocumentUrl: '/api-yaml',
-    swaggerOptions: {
-      urls: [
-        { url: '/api-json', name: 'JSON' },
-        { url: '/api-yaml', name: 'YAML' },
-      ],
-    },
-  });
+  app.use('/docs', apiReference({ content: cleanedDoc }));
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
