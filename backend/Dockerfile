@@ -2,7 +2,7 @@ FROM node:24-alpine
 
 WORKDIR /app
 
-# Copiar package files
+
 COPY package.json pnpm-lock.yaml ./
 
 RUN corepack enable
